@@ -22,7 +22,7 @@ const useFetch = <T>(fetchFunction: () => Promise<T>, autoFetch = true) => {
 
     const reset = () => {
         setData(null)
-        setLoading(true);
+        setLoading(false);
         setError(null)
     }
 
