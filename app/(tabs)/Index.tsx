@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { ActivityIndicator, FlatList, Image, ScrollView, Text, View } from "react-native";
 
 // components
+import MovieCard from "@/components/MovieCard";
 import SearchBar from "@/components/SearchBar";
 import { fetchMovies } from "@/services/api";
 import useFetch from "@/services/useFetch";
@@ -32,7 +33,7 @@ export default function Index() {
               <FlatList
                 data={movies}
                 renderItem={({ item }) => (
-                  <Text className="text-white text-sm">{item.title}</Text>
+                  <MovieCard {...item} />
                 )}
                 keyExtractor={(item) => item.id}
                 numColumns={3}
