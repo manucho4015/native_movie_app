@@ -1,0 +1,54 @@
+import { Client, ID, Query, TablesDB } from 'react-native-appwrite'
+// track searches made by user
+
+const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID!
+const TABLE_ID = process.env.EXPO_PUBLIC_APPWRITE_TABLE_ID!
+
+const client = new Client()
+    .setEndpoint('https://cloud.appwrite.io/v1')
+    .setProject(process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID!)
+
+const tablesDB = new TablesDB(client)
+
+export const updateSearchCount = async (query: string, movie: Movie) => {
+    try {
+        // check if record already exists on DB 
+        const result = await tablesDB.listRows({ databaseId: DATABASE_ID, tableId: TABLE_ID, queries: [Query.equal('searchTerm', query)] })
+
+        // console.log(result)
+        // if record found, increment 'count' field
+
+        if (result.rows.length > 0) {
+            const existingMovie = result.rows[0]
+
+            await tablesDB.updateRow({
+                databaseId: DATABASE_ID,
+                tableId: TABLE_ID,
+                rowId: existingMovie.$id,
+                data: {
+                    count: existingMovie.count + 1
+                }
+            })
+        } else {
+            // if no record found,
+            // create new record in Appwrite DB -> 'count' field set to 1
+            await tablesDB.createRow({
+                databaseId: DATABASE_ID,
+                tableId: TABLE_ID,
+                rowId: ID.unique(),
+                data: {
+                    searchTerm: query,
+                    movie_id: movie.id,
+                    count: 1,
+                    poster_url: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+                    title: movie.title
+                }
+            })
+        }
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+
+
+}
